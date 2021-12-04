@@ -1,8 +1,11 @@
 const Web3 = require('web3');
 const erc20Abi = require('./abis/erc20.json');
+const aggregatorV3InterfaceABI = require('./abis/aggregatorV3Interface.json');
 
 const web3 = new Web3(
-  new Web3.providers.WebsocketProvider('RPC Websocket URL')
+  new Web3.providers.WebsocketProvider(
+    'https://data-seed-prebsc-1-s3.binance.org:8545/'
+  )
 );
 
 const contract = new web3.eth.Contract(erc20Abi, 'contract address');
@@ -66,7 +69,7 @@ const scream = () => {
     });
 };
 
-scream();
+//scream();
 
 // Result:
 // {
@@ -87,8 +90,6 @@ scream();
 // }
 
 const contractScream = () => {
-  console.log('scream');
-
   web3.eth
     .subscribe('logs', {
       address: 'smart contract address',
@@ -104,7 +105,7 @@ const contractScream = () => {
     });
 };
 
-contractScream();
+//contractScream();
 
 // Result:
 // {
@@ -123,5 +124,27 @@ contractScream();
 //   removed: false,
 //   id: 'log_ea1a426c'
 // }
+
+// sign and send message on the blockchain
+const signAndSendMessage = async () => {
+  const privateKey =
+    '0x367df12b3064ba363de465bf299e78a68aae69932918b160f1724e688050f73d';
+  const message = 'Hello World';
+  const signature = await web3.eth.accounts.sign(message, privateKey);
+  console.log(signature);
+};
+
+//signAndSendMessage();
+
+const getEthLatestPrice = async () => {
+  const addr = '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419';
+  const priceFeed = new web3.eth.Contract(aggregatorV3InterfaceABI, addr);
+  const price = await priceFeed.methods.latestRoundData().call();
+  const priceInUSD = price.answer / 10 ** 8;
+
+  return priceInUSD;
+};
+
+getEthLatestPrice();
 
 // Made by @iamnotstatic ❤️
